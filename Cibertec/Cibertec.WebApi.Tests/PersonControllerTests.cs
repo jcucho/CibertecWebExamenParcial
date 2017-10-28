@@ -1,30 +1,25 @@
-﻿using Cibertec.Mocked;
-using Cibertec.Models;
-using Cibertec.UnitOfWork;
-using Cibertec.WebApi.Controllers;
-using FluentAssertions;
-using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Collections.Generic;
+﻿using Cibertec.WebApi.Controllers;
 using Xunit;
+using Cibertec.Repositories.Dapper.School;
+using Microsoft.AspNetCore.Mvc;
+using System.Collections.Generic;
+using Cibertec.Models;
+using FluentAssertions;
+using System;
 
 namespace Cibertec.WebApi.Tests
 {
     public class PersonControllerTests
     {
         private readonly PersonController _personController;
-        private readonly IUnitOfWork _uniMocked;
 
         public PersonControllerTests()
         {
-            var unitMocked = new UnitOfWorkMocked();
-            _uniMocked = unitMocked.GetInstance();
-            _personController = new PersonController(_uniMocked);
-            //_personController = new PersonController(new SchoolUnitOfWork(ConfigSettings.SchoolConnectionString));
+            _personController = new PersonController(new SchoolUnitOfWork(ConfigSettings.SchoolConnectionString));
         }
 
         [Fact(DisplayName = "[PersonController] Get List")]
-        public void Test_Get_All_Fluent()
+        public void Get_List()
         {
             var result = _personController.GetList() as OkObjectResult;
 
@@ -36,70 +31,70 @@ namespace Cibertec.WebApi.Tests
         }
 
         [Fact(DisplayName = "[PersonController] Insert")]
-        public void Insert_Person_Test()
+        public void Test_Person_Insert()
         {
-            var person = new Person
-            {
-                PersonID = 101,
-                LastName = "Cucho",
-                FirstName = "Juan",
-                HireDate = DateTime.Now,
-                EnrollmentDate = DateTime.Now
-            };
-
-            var result = _personController.Post(person) as OkObjectResult;
+            var person = GetInsertPerson();
+            var result = _personController.Post(person);
             result.Should().NotBeNull();
-            result.Value.Should().NotBeNull();
-
-            var model = Convert.ToInt32(result.Value);
-            model.Should().Be(101);
         }
 
         [Fact(DisplayName = "[PersonController] Update")]
-        public void Update_Customer_Test()
+        public void Test_Person_Update()
         {
-            var person = new Person
-            {
-                PersonID = 1,
-                LastName = "Cucho",
-                FirstName = "Juan",
-                HireDate = DateTime.Now,
-                EnrollmentDate = DateTime.Now
-            };
-
-            var result = _personController.Put(person) as OkObjectResult;
-
+            var person = GetUpdatePerson();
+            var result = _personController.Put(person);
             result.Should().NotBeNull();
-            result.Value.Should().NotBeNull();
-
-            var model = result.Value?.GetType().GetProperty("Message").GetValue(result.Value);
-            model.Should().Be("The person is updated");
-
-            var currentPerson = _uniMocked.Persons.GetById(1);
-            currentPerson.Should().NotBeNull();
-            currentPerson.PersonID.Should().Be(person.PersonID);
-            currentPerson.LastName.Should().Be(person.LastName);
-            currentPerson.HireDate.Should().Be(person.HireDate);
-            currentPerson.EnrollmentDate.Should().Be(person.EnrollmentDate);
         }
 
         [Fact(DisplayName = "[PersonController] Delete")]
-        public void Delete_Customer_Test()
+        public void Test_Person_Delete()
         {
-            var person = new Person
-            {
-                PersonID = 1
-            };
-
-            var result = _personController.Delete(person) as OkObjectResult;
+            var person = GetDeletePerson();
+            var result = _personController.Delete(person);
             result.Should().NotBeNull();
-            result.Value.Should().NotBeNull();
+        }
 
-            var model = Convert.ToBoolean(result.Value);
-            model.Should().BeTrue();
+        [Fact(DisplayName = "[PersonController] Get Id")]
+        public void Test_Person_GetId()
+        {
+            var result = _personController.getById(1);
+            result.Should().NotBeNull();
+        }
 
-            var currentCustomer = _uniMocked.Persons.GetById(1);
-            currentCustomer.Should().BeNull();
+        private Person GetInsertPerson()
+        {
+            return new Person
+            {
+                PersonID = 35,
+                LastName = "Juan",
+                FirstName = "Cucho",
+                HireDate = DateTime.Now,
+                EnrollmentDate = DateTime.Now
+            };
+        }
+
+        private Person GetUpdatePerson()
+        {
+            return new Person
+            {
+                PersonID = 34,
+                LastName = "Juan",
+                FirstName = "Cucho",
+                HireDate = DateTime.Now,
+                EnrollmentDate = DateTime.Now
+            };
+        }
+
+        private Person GetDeletePerson()
+        {
+            return new Person
+            {
+                PersonID = 34,
+                LastName = "Van Houten",
+                FirstName = "Roger",
+                HireDate = DateTime.Now,
+                EnrollmentDate = DateTime.Now
+            };
         }
     }
 }

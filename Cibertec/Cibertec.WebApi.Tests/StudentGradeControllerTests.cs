@@ -18,17 +18,7 @@ namespace Cibertec.WebApi.Tests
         }
 
         [Fact(DisplayName = "[StudentGradeController] Get List")]
-        public void Test_Get_All()
-        {
-            var result = _studentGradeController.GetList() as OkObjectResult;
-            Assert.True(result != null);
-            Assert.True(result.Value != null);
-            var model = result.Value as List<StudentGrade>;
-            Assert.True(model.Count > 0);
-        }
-
-        [Fact(DisplayName = "[StudentGradeController] Get List All_Fluent")]
-        public void Test_Get_All_Fluent()
+        public void Test_Get_List()
         {
             var result = _studentGradeController.GetList() as OkObjectResult;
 
@@ -37,6 +27,69 @@ namespace Cibertec.WebApi.Tests
 
             var model = result.Value as List<StudentGrade>;
             model.Count.Should().BeGreaterThan(0);
+        }
+
+        [Fact(DisplayName = "[StudentGradeController] Insert")]
+        public void Test_StudentGrade_Insert()
+        {
+            var studentGrade = GetNewStudentGrade();
+            var result = _studentGradeController.Post(studentGrade);
+            result.Should().NotBeNull();            
+        }
+
+        [Fact(DisplayName = "[StudentGradeController] Delete")]
+        public void Test_StudentGrade_Delete()
+        {
+            var studentGrade = GetDeleteStudentGrade();
+            var result = _studentGradeController.Delete(studentGrade);
+            result.Should().NotBeNull();
+        }
+
+        [Fact(DisplayName = "[StudentGradeController] Update")]
+        public void Test_StudentGrade_Update()
+        {
+            var studentGrade = GetUpdateStudentGrade();
+            var result = _studentGradeController.Put(studentGrade);
+            result.Should().NotBeNull();
+        }
+
+        [Fact(DisplayName = "[StudentGradeController] Get Id")]
+        public void Test_StudentGrade_GetId()
+        {
+            var result = _studentGradeController.getById(39);
+            result.Should().NotBeNull();
+        }
+
+        private StudentGrade GetUpdateStudentGrade()
+        {
+            return new StudentGrade
+            {
+                EnrollmentID = 39,
+                CourseID = 1050,
+                StudentID = 30,
+                Grade = 4
+            };
+        }
+
+        private StudentGrade GetDeleteStudentGrade()
+        {
+            return new StudentGrade
+            {
+                EnrollmentID = 40,
+                CourseID = 1061,
+                StudentID = 30,
+                Grade = 4
+            };
+        }
+
+        private StudentGrade GetNewStudentGrade()
+        {
+            return new StudentGrade
+            {
+                CourseID = 1061,
+                StudentID = 30,               
+                Grade= 4
+            };
         }
     }
 }
